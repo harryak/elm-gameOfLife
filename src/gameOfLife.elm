@@ -12,6 +12,10 @@ import Dict
 import List
 import Maybe
 
+import Html
+import Html.Attributes as HtmlAttr
+import Html.Events as HtmlEv
+
 -- own modules
 import ListExtension as LEx
 
@@ -142,6 +146,9 @@ tileWillLive pos dict (min, max) =
 channelTileUpdate : Channel (Maybe (Int, Int))
 channelTileUpdate = channel Nothing
 
+channelPlayPause : Channel State
+channelPlayPause = channel Paused
+
 -- updates of game-state
 updateFromClick : Maybe (Int, Int) -> Game -> Game
 updateFromClick action game =
@@ -190,8 +197,28 @@ getElementAt (x, y) shapeFilled =
 
 display : (Int, Int) -> Game -> GElement.Element
 display (w, h) game =
-    GCollage.collage w h
-        (List.map (\(_, elem) -> elem) (Dict.values game.board))
+    let gameOffsetYDir  = (h - gameHeight) // 2
+        playButtonStyle = HtmlAttr.style    [ ("width", "50px")
+                                            , ("height", "50px")
+                                            , ("font-size", "28pt")
+                                            , ("background-color", "lightgray")
+                                            , ("color", "darkgray")
+                                            , ("border-radius", "5px")
+                                            , ("text-align", "center")
+                                            , ("font-weight", "bolder")
+                                            , ("cursor", "pointer")]
+        sideBarStyle = HtmlAttr.style  [ ("width", "150px")
+                                        , ("height", (toString gameHeight) ++ "px")
+                                        , ("padding-left", "25px")
+                                        , ("margin-top", (toString gameOffsetYDir) ++ "px")]
+        playButton = Html.div [ playButtonStyle, HtmlEv.onClick (send channelPlayPause Playing) ] [ Html.text ">" ]
+        sideBar    = Html.div [ sideBarStyle ] [ playButton ]
+                        |> Html.toElement 150 gameHeight
+    in  GElement.flow GElement.right
+            [ sideBar
+            , GCollage.collage (w - 150) h
+                (List.map (\(_, elem) -> elem) (Dict.values game.board))
+            ]
 
 {-----------------------------------
  - Main-function
