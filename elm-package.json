@@ -1,0 +1,13 @@
+{
+    "version": "0.0.1",
+    "summary": "conway's game of life in an elm implementation",
+    "repository": "https://github.com/harryak/elm-gameOfLife.git",
+    "license": "GPLv2",
+    "source-directories": [
+        "."
+    ],
+    "exposed-modules": [],
+    "dependencies": {
+        "elm-lang/core": "1.1.0 <= v < 2.0.0"
+    }
+}
