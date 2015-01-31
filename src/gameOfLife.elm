@@ -8,6 +8,7 @@ import Graphics.Collage as GCollage
 import Graphics.Input as GInput
 import Color
 import Signal (..)
+import Text
 import Time
 import Dict
 import List
