@@ -155,7 +155,7 @@ tileWillLive (under, over, repr) pos dict =
     )
 
 -- Using the above function with Conway's boundaries.
-tileWillLiveConway = tileWillLive (1, 3, 3)
+tileWillLiveConway = tileWillLive (1, 4, 3)
 
 {-----------------------------------
  - Helpers for display
