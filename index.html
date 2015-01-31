@@ -1836,12 +1836,13 @@ Elm.GameOfLife.make = function (_elm) {
                  return bool ? _v2._0 : _v2._1;
               });}
          _U.badCase($moduleName,
-         "between lines 125 and 126");
+         "between lines 126 and 127");
       }();
    });
    var Tick = function (a) {
       return {ctor: "Tick",_0: a};
    };
+   var channelTickGame = $Signal.channel(Tick($Maybe.Nothing));
    var GameState = function (a) {
       return {ctor: "GameState"
              ,_0: a};
@@ -1850,6 +1851,8 @@ Elm.GameOfLife.make = function (_elm) {
       return {ctor: "Tile",_0: a};
    };
    var channelTileUpdate = $Signal.channel(Tile($Maybe.Nothing));
+   var MultiStep = {ctor: "MultiStep"};
+   var SingleStep = {ctor: "SingleStep"};
    var Playing = {ctor: "Playing"};
    var Paused = {ctor: "Paused"};
    var channelPlayPause = $Signal.channel(GameState(Paused));
@@ -1859,8 +1862,8 @@ Elm.GameOfLife.make = function (_elm) {
              ,speed: c
              ,state: b};
    });
-   var gameHeight = 400;
-   var gameWidth = 600;
+   var gameHeight = 600;
+   var gameWidth = 800;
    var tileColorOff = $Color.green;
    var tileColorOn = $Color.black;
    var tileGap = 2;
@@ -2017,7 +2020,7 @@ Elm.GameOfLife.make = function (_elm) {
                                                                                                                ,_1: sy}]);
               }();}
          _U.badCase($moduleName,
-         "between lines 88 and 120");
+         "between lines 89 and 121");
       }();
    };
    var getAliveTilesAround = F2(function (pos,
@@ -2053,7 +2056,7 @@ Elm.GameOfLife.make = function (_elm) {
                  }();
               });}
          _U.badCase($moduleName,
-         "between lines 145 and 153");
+         "between lines 146 and 154");
       }();
    });
    var tileWillLiveConway = tileWillLive({ctor: "_Tuple3"
@@ -2095,15 +2098,19 @@ Elm.GameOfLife.make = function (_elm) {
                switch (action._0.ctor)
                  {case "Just":
                     switch (action._0._0.ctor)
-                      {case "_Tuple0":
+                      {case "MultiStep":
                          return _U.eq(game.state,
-                           Playing) ? updateBoard(game) : game;}
+                           Playing) ? updateBoard(game) : game;
+                         case "SingleStep":
+                         return _U.eq(game.state,
+                           Paused) ? updateBoard(game) : game;}
                       break;}
                  break;
                case "Tile":
                switch (action._0.ctor)
                  {case "Just":
-                    return A2(updateTile,
+                    return _U.eq(game.state,
+                      Playing) ? game : A2(updateTile,
                       action._0._0,
                       game);}
                  break;}
@@ -2131,6 +2138,12 @@ Elm.GameOfLife.make = function (_elm) {
          switch (_v23.ctor)
          {case "_Tuple2":
             return function () {
+                 var nextStepButton = A2($Html.div,
+                 _L.fromArray([$Html$Attributes.$class("button")
+                              ,$Html$Events.onClick(A2($Signal.send,
+                              channelTickGame,
+                              Tick($Maybe.Just(SingleStep))))]),
+                 _L.fromArray([$Html.text(">|")]));
                  var playing = _U.eq(game.state,
                  Playing);
                  var buttonSymbol = playing ? "II" : ">";
@@ -2143,7 +2156,7 @@ Elm.GameOfLife.make = function (_elm) {
                  _L.fromArray([$Html.text(buttonSymbol)]));
                  var sideBar = A2($Html.toElement,
                  150,
-                 gameHeight)(A2($Html.div,
+                 _v23._1)(A2($Html.div,
                  _L.fromArray([$Html$Attributes.id("sidebar")
                               ,$Html$Attributes.style(_L.fromArray([{ctor: "_Tuple2"
                                                                     ,_0: "top"
@@ -2154,7 +2167,8 @@ Elm.GameOfLife.make = function (_elm) {
                                                                     "px")}]))]),
                  _L.fromArray([A2($Html.div,
                  _L.fromArray([]),
-                 _L.fromArray([playButton]))])));
+                 _L.fromArray([playButton
+                              ,nextStepButton]))])));
                  var _ = A2($Debug.watch,
                  "game",
                  game.state);
@@ -2218,13 +2232,13 @@ Elm.GameOfLife.make = function (_elm) {
                                               }();}
                                          break;}
                                     _U.badCase($moduleName,
-                                    "between lines 198 and 213");
+                                    "between lines 203 and 218");
                                  }();
                               },
                               $Dict.toList(game.board))))]));
               }();}
          _U.badCase($moduleName,
-         "between lines 175 and 215");
+         "between lines 176 and 220");
       }();
    });
    var main = A2($Signal._op["~"],
@@ -2239,10 +2253,11 @@ Elm.GameOfLife.make = function (_elm) {
                                   ,A2($Signal._op["<~"],
                                   function (_v33) {
                                      return function () {
-                                        return Tick($Maybe.Just({ctor: "_Tuple0"}));
+                                        return Tick($Maybe.Just(MultiStep));
                                      }();
                                   },
-                                  $Time.fps(0.5))]))));
+                                  $Time.fps(1))
+                                  ,$Signal.subscribe(channelTickGame)]))));
    _elm.GameOfLife.values = {_op: _op
                             ,tileSize: tileSize
                             ,tileGap: tileGap
@@ -2255,6 +2270,8 @@ Elm.GameOfLife.make = function (_elm) {
                             ,Game: Game
                             ,Paused: Paused
                             ,Playing: Playing
+                            ,SingleStep: SingleStep
+                            ,MultiStep: MultiStep
                             ,Tile: Tile
                             ,GameState: GameState
                             ,Tick: Tick
@@ -2270,6 +2287,7 @@ Elm.GameOfLife.make = function (_elm) {
                             ,display: display
                             ,channelTileUpdate: channelTileUpdate
                             ,channelPlayPause: channelPlayPause
+                            ,channelTickGame: channelTickGame
                             ,updateGame: updateGame
                             ,updateState: updateState
                             ,updateTile: updateTile

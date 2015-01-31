@@ -39,10 +39,10 @@ tileColorOff : Color.Color
 tileColorOff = Color.green
 
 gameWidth : Int
-gameWidth = 600
+gameWidth = 800
 
 gameHeight : Int
-gameHeight = 400
+gameHeight = 600
 
 {-----------------------------------
  - Calculated config
@@ -60,9 +60,10 @@ type alias Board = Dict.Dict (Int, Int) Bool
 type alias Game  =  { board: Board
                     , state: State
                     , speed: Float }
-type State = Paused | Playing
+type State       = Paused | Playing
 
-type Update = Tile (Maybe (Int, Int)) | GameState State |Tick (Maybe ())
+type TickType    = SingleStep | MultiStep
+type Update      = Tile (Maybe (Int, Int)) | GameState State |Tick (Maybe TickType)
 
 {-----------------------------------
  - Initial state
@@ -181,15 +182,19 @@ display (w, h) game =
                         , HtmlEv.onClick (send channelPlayPause newGameState)
                         ]
                         [ Html.text buttonSymbol ]
+        nextStepButton = Html.div
+                        [ HtmlAttr.class "button"
+                        , HtmlEv.onClick (send channelTickGame (Tick (Just SingleStep)) )
+                        ]
+                        [ Html.text ">|" ]
         sideBar    = Html.div
                         [ HtmlAttr.id "sidebar"
                         , HtmlAttr.style [("top", (toString (tilePosYDir 0 h)) ++ "px")] ]
                         [ Html.div []
-                            [
-                              playButton
-                            ]
+                            [ playButton
+                            , nextStepButton ]
                         ]
-                        |> Html.toElement 150 gameHeight
+                        |> Html.toElement 150 h
     in  GElement.flow GElement.right
             [ sideBar
             , Html.div [ HtmlAttr.id "boardContainer" ] (
@@ -217,27 +222,25 @@ display (w, h) game =
 {-----------------------------------
  - Channels and Signals
  -----------------------------------}
-{-channelTileUpdate : Channel (Maybe (Int, Int))
-channelTileUpdate = channel Nothing
-
-channelPlayPause : Channel Bool
-channelPlayPause = channel False-}
-
 channelTileUpdate : Channel Update
 channelTileUpdate = channel (Tile Nothing)
 
 channelPlayPause : Channel Update
 channelPlayPause = channel (GameState Paused)
 
+channelTickGame : Channel Update
+channelTickGame = channel (Tick Nothing)
+
 -- updates of game-state
 updateGame : Update -> Game -> Game
 updateGame action game =
     let _ = Debug.watch "action" action
     in  case action of
-            Tile (Just pos) -> updateTile pos game
-            GameState state -> updateState state game
-            Tick (Just ())  -> if game.state == Playing then updateBoard game else game
-            _               -> game
+            Tile (Just pos)         -> if game.state == Playing then game else updateTile pos game
+            GameState state         -> updateState state game
+            Tick (Just MultiStep)   -> if game.state == Playing then updateBoard game else game
+            Tick (Just SingleStep)  -> if game.state == Paused  then updateBoard game else game
+            _                       -> game
 
 updateState : State -> Game -> Game
 updateState newState game = {game | state <- newState}
@@ -267,7 +270,8 @@ main = display <~ Window.dimensions
                 ~ foldp updateGame defaultGame (
                         mergeMany   [ subscribe channelTileUpdate
                                     , subscribe channelPlayPause
-                                    , (\_ -> Tick (Just ()) ) <~ (Time.fps 0.5)
+                                    , (\_ -> Tick (Just MultiStep) ) <~ (Time.fps 1)
+                                    , subscribe channelTickGame
                                     ]
                   )
                 -- ~ foldp updateTile defaultGame (subscribe channelTileUpdate)
