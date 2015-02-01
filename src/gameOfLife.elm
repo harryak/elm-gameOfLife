@@ -28,8 +28,7 @@ import GameOfLifeConfig (..)
  -----------------------------------}
 type alias Board = Dict.Dict (Int, Int) Bool
 type alias Game  =  { board: Board
-                    , state: State
-                    , speed: Float }
+                    , state: State }
 type State       = Paused | Playing
 
 type TickType    = SingleStep | MultiStep
@@ -39,7 +38,6 @@ type Update      = Tile (Maybe (Int, Int)) | GameState State | Tick TickType | R
  - Initial state
  -----------------------------------}
 -- Use configuration to create the empty board.
--- Implementation note: This is rather complicated and holds the GCollage.Elements for fast access
 emptyBoard : Board
 emptyBoard =    LEx.cartesianProduct (,) (
                     LEx.cartesianProduct (,) [0..tileNumberXDir] [0..tileNumberYDir]
@@ -48,8 +46,7 @@ emptyBoard =    LEx.cartesianProduct (,) (
 
 defaultGame : Game
 defaultGame =   { board = emptyBoard
-                , state = Paused
-                , speed = 0.5 }
+                , state = Paused }
 
 {-----------------------------------
  - Game rules

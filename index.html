@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <html><head><meta charset="UTF-8"><title>GameOfLife</title><style>html,head,body { padding:0; margin:0; }
-body { font-family: calibri, helvetica, arial, sans-serif; }</style><link rel="stylesheet" href="main.css"><script type="text/javascript">var Elm = Elm || { Native: {} };Elm.Array = Elm.Array || {};
+body { font-family: calibri, helvetica, arial, sans-serif; }</style><script type="text/javascript">var Elm = Elm || { Native: {} };Elm.Array = Elm.Array || {};
 Elm.Array.make = function (_elm) {
    "use strict";
    _elm.Array = _elm.Array || {};
@@ -1841,10 +1841,10 @@ Elm.GameOfLife.make = function (_elm) {
                                 ,_1: (_v2._1 - tileOffsetY) / ($GameOfLifeConfig.tileSize + $GameOfLifeConfig.tileGap) | 0};
                       }();}
                  _U.badCase($moduleName,
-                 "between lines 143 and 145");
+                 "between lines 140 and 142");
               }();}
          _U.badCase($moduleName,
-         "between lines 143 and 145");
+         "between lines 140 and 142");
       }();
    });
    var tilePosYDir = F2(function (y,
@@ -1873,7 +1873,7 @@ Elm.GameOfLife.make = function (_elm) {
                  return bool ? _v10._0 : _v10._1;
               });}
          _U.badCase($moduleName,
-         "between lines 96 and 97");
+         "between lines 93 and 94");
       }();
    });
    var tileNeighbours = function (_v14) {
@@ -2007,7 +2007,7 @@ Elm.GameOfLife.make = function (_elm) {
                                                                                                                                   ,_1: sy}]);
               }();}
          _U.badCase($moduleName,
-         "between lines 59 and 91");
+         "between lines 56 and 88");
       }();
    };
    var getAliveTilesAround = F2(function (pos,
@@ -2043,7 +2043,7 @@ Elm.GameOfLife.make = function (_elm) {
                  }();
               });}
          _U.badCase($moduleName,
-         "between lines 116 and 124");
+         "between lines 113 and 121");
       }();
    });
    var tileWillLiveConway = tileWillLive({ctor: "_Tuple3"
@@ -2106,7 +2106,6 @@ Elm.GameOfLife.make = function (_elm) {
    var Paused = {ctor: "Paused"};
    var defaultGame = {_: {}
                      ,board: emptyBoard
-                     ,speed: 0.5
                      ,state: Paused};
    var channelPlayPause = $Signal.channel(GameState(Paused));
    var display = F2(function (_v25,
@@ -2226,13 +2225,13 @@ Elm.GameOfLife.make = function (_elm) {
                                               }();}
                                          break;}
                                     _U.badCase($moduleName,
-                                    "between lines 189 and 204");
+                                    "between lines 186 and 201");
                                  }();
                               },
                               $Dict.toList(game.board))))]));
               }();}
          _U.badCase($moduleName,
-         "between lines 152 and 206");
+         "between lines 149 and 203");
       }();
    });
    var updateGame = F2(function (action,
@@ -2302,7 +2301,7 @@ Elm.GameOfLife.make = function (_elm) {
                                              ,_1: _v42._1},
                                              dim)));}
                                         _U.badCase($moduleName,
-                                        "between lines 267 and 269");
+                                        "between lines 264 and 266");
                                      }();
                                   }),
                                   A3($Signal.keepWhen,
@@ -2310,10 +2309,9 @@ Elm.GameOfLife.make = function (_elm) {
                                   {ctor: "_Tuple2",_0: -1,_1: -1},
                                   $Mouse.position)),
                                   $Window.dimensions)]))));
-   var Game = F3(function (a,b,c) {
+   var Game = F2(function (a,b) {
       return {_: {}
              ,board: a
-             ,speed: c
              ,state: b};
    });
    _elm.GameOfLife.values = {_op: _op
