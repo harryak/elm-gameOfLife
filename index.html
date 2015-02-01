@@ -1796,6 +1796,7 @@ Elm.GameOfLife.make = function (_elm) {
    $List = Elm.List.make(_elm),
    $ListExtension = Elm.ListExtension.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Mouse = Elm.Mouse.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Time = Elm.Time.make(_elm),
    $Window = Elm.Window.make(_elm);
@@ -1839,10 +1840,11 @@ Elm.GameOfLife.make = function (_elm) {
          "between lines 126 and 127");
       }();
    });
+   var Reset = {ctor: "Reset"};
+   var channelResetGame = $Signal.channel(Reset);
    var Tick = function (a) {
       return {ctor: "Tick",_0: a};
    };
-   var channelTickGame = $Signal.channel(Tick($Maybe.Nothing));
    var GameState = function (a) {
       return {ctor: "GameState"
              ,_0: a};
@@ -1853,6 +1855,7 @@ Elm.GameOfLife.make = function (_elm) {
    var channelTileUpdate = $Signal.channel(Tile($Maybe.Nothing));
    var MultiStep = {ctor: "MultiStep"};
    var SingleStep = {ctor: "SingleStep"};
+   var channelTickGame = $Signal.channel(Tick(SingleStep));
    var Playing = {ctor: "Playing"};
    var Paused = {ctor: "Paused"};
    var channelPlayPause = $Signal.channel(GameState(Paused));
@@ -2094,17 +2097,16 @@ Elm.GameOfLife.make = function (_elm) {
                return A2(updateState,
                  action._0,
                  game);
+               case "Reset":
+               return defaultGame;
                case "Tick":
                switch (action._0.ctor)
-                 {case "Just":
-                    switch (action._0._0.ctor)
-                      {case "MultiStep":
-                         return _U.eq(game.state,
-                           Playing) ? updateBoard(game) : game;
-                         case "SingleStep":
-                         return _U.eq(game.state,
-                           Paused) ? updateBoard(game) : game;}
-                      break;}
+                 {case "MultiStep":
+                    return _U.eq(game.state,
+                      Playing) ? updateBoard(game) : game;
+                    case "SingleStep":
+                    return _U.eq(game.state,
+                      Paused) ? updateBoard(game) : game;}
                  break;
                case "Tile":
                switch (action._0.ctor)
@@ -2132,10 +2134,32 @@ Elm.GameOfLife.make = function (_elm) {
          return y * (tileSize + tileGap) + tileOffsetY;
       }();
    });
-   var display = F2(function (_v23,
-   game) {
+   var getTileFrom = F2(function (_v22,
+   _v23) {
       return function () {
          switch (_v23.ctor)
+         {case "_Tuple2":
+            return function () {
+                 switch (_v22.ctor)
+                 {case "_Tuple2":
+                    return function () {
+                         var tileOffsetY = (_v23._1 - gameHeight) / 2 | 0;
+                         var tileOffsetX = (_v23._0 - gameWidth) / 2 | 0;
+                         return {ctor: "_Tuple2"
+                                ,_0: (_v22._0 - tileOffsetX) / (tileSize + tileGap) | 0
+                                ,_1: (_v22._1 - tileOffsetY) / (tileSize + tileGap) | 0};
+                      }();}
+                 _U.badCase($moduleName,
+                 "between lines 173 and 175");
+              }();}
+         _U.badCase($moduleName,
+         "between lines 173 and 175");
+      }();
+   });
+   var display = F2(function (_v30,
+   game) {
+      return function () {
+         switch (_v30.ctor)
          {case "_Tuple2":
             return function () {
                  var playing = _U.eq(game.state,
@@ -2157,23 +2181,35 @@ Elm.GameOfLife.make = function (_elm) {
                                                                         ,_1: playing}]))
                               ,$Html$Events.onClick(A2($Signal.send,
                               channelTickGame,
-                              Tick($Maybe.Just(SingleStep))))]),
+                              Tick(SingleStep)))]),
                  _L.fromArray([$Html.text(">|")]));
+                 var resetButton = A2($Html.div,
+                 _L.fromArray([$Html$Attributes.classList(_L.fromArray([{ctor: "_Tuple2"
+                                                                        ,_0: "button"
+                                                                        ,_1: true}
+                                                                       ,{ctor: "_Tuple2"
+                                                                        ,_0: "invisible"
+                                                                        ,_1: playing}]))
+                              ,$Html$Events.onClick(A2($Signal.send,
+                              channelResetGame,
+                              Reset))]),
+                 _L.fromArray([$Html.text("R")]));
                  var sideBar = A2($Html.toElement,
                  150,
-                 _v23._1)(A2($Html.div,
+                 _v30._1)(A2($Html.div,
                  _L.fromArray([$Html$Attributes.id("sidebar")
                               ,$Html$Attributes.style(_L.fromArray([{ctor: "_Tuple2"
                                                                     ,_0: "top"
                                                                     ,_1: A2($Basics._op["++"],
                                                                     $Basics.toString(A2(tilePosYDir,
                                                                     0,
-                                                                    _v23._1)),
+                                                                    _v30._1)),
                                                                     "px")}]))]),
                  _L.fromArray([A2($Html.div,
                  _L.fromArray([]),
                  _L.fromArray([playButton
-                              ,nextStepButton]))])));
+                              ,nextStepButton
+                              ,resetButton]))])));
                  var _ = A2($Debug.watch,
                  "game",
                  game.state);
@@ -2185,19 +2221,19 @@ Elm.GameOfLife.make = function (_elm) {
                               gameHeight)(A2($Html.div,
                               _L.fromArray([$Html$Attributes.id("boardContainer")]),
                               A2($List.map,
-                              function (_v27) {
+                              function (_v34) {
                                  return function () {
-                                    switch (_v27.ctor)
+                                    switch (_v34.ctor)
                                     {case "_Tuple2":
-                                       switch (_v27._0.ctor)
+                                       switch (_v34._0.ctor)
                                          {case "_Tuple2":
                                             return function () {
                                                  var yPos = A2(tilePosYDir,
-                                                 _v27._0._1,
-                                                 _v23._1);
+                                                 _v34._0._1,
+                                                 _v30._1);
                                                  var xPos = A2(tilePosXDir,
-                                                 _v27._0._0,
-                                                 _v23._0);
+                                                 _v34._0._0,
+                                                 _v30._0);
                                                  return A2($Html.div,
                                                  _L.fromArray([$Html$Attributes.style(_L.fromArray([{ctor: "_Tuple2"
                                                                                                     ,_0: "left"
@@ -2224,26 +2260,26 @@ Elm.GameOfLife.make = function (_elm) {
                                                                                                         ,_1: true}
                                                                                                        ,{ctor: "_Tuple2"
                                                                                                         ,_0: "alive"
-                                                                                                        ,_1: _v27._1}
+                                                                                                        ,_1: _v34._1}
                                                                                                        ,{ctor: "_Tuple2"
                                                                                                         ,_0: "dead"
-                                                                                                        ,_1: $Basics.not(_v27._1)}]))
+                                                                                                        ,_1: $Basics.not(_v34._1)}]))
                                                               ,$Html$Events.onClick(A2($Signal.send,
                                                               channelTileUpdate,
                                                               Tile($Maybe.Just({ctor: "_Tuple2"
-                                                                               ,_0: _v27._0._0
-                                                                               ,_1: _v27._0._1}))))]),
+                                                                               ,_0: _v34._0._0
+                                                                               ,_1: _v34._0._1}))))]),
                                                  _L.fromArray([]));
                                               }();}
                                          break;}
                                     _U.badCase($moduleName,
-                                    "between lines 205 and 220");
+                                    "between lines 219 and 234");
                                  }();
                               },
                               $Dict.toList(game.board))))]));
               }();}
          _U.badCase($moduleName,
-         "between lines 176 and 222");
+         "between lines 182 and 236");
       }();
    });
    var main = A2($Signal._op["~"],
@@ -2255,14 +2291,37 @@ Elm.GameOfLife.make = function (_elm) {
    defaultGame,
    $Signal.mergeMany(_L.fromArray([$Signal.subscribe(channelTileUpdate)
                                   ,$Signal.subscribe(channelPlayPause)
+                                  ,$Signal.subscribe(channelTickGame)
+                                  ,$Signal.subscribe(channelResetGame)
                                   ,A2($Signal._op["<~"],
-                                  function (_v33) {
+                                  function (_v40) {
                                      return function () {
-                                        return Tick($Maybe.Just(MultiStep));
+                                        return Tick(MultiStep);
                                      }();
                                   },
                                   $Time.fps(1))
-                                  ,$Signal.subscribe(channelTickGame)]))));
+                                  ,A2($Signal._op["~"],
+                                  A2($Signal._op["<~"],
+                                  F2(function (_v42,dim) {
+                                     return function () {
+                                        switch (_v42.ctor)
+                                        {case "_Tuple2":
+                                           return _U.cmp(_v42._0,
+                                             0) < 0 || _U.cmp(_v42._1,
+                                             0) < 0 ? Tile($Maybe.Nothing) : Tile($Maybe.Just(A2(getTileFrom,
+                                             {ctor: "_Tuple2"
+                                             ,_0: _v42._0
+                                             ,_1: _v42._1},
+                                             dim)));}
+                                        _U.badCase($moduleName,
+                                        "between lines 297 and 299");
+                                     }();
+                                  }),
+                                  A3($Signal.keepWhen,
+                                  $Mouse.isDown,
+                                  {ctor: "_Tuple2",_0: -1,_1: -1},
+                                  $Mouse.position)),
+                                  $Window.dimensions)]))));
    _elm.GameOfLife.values = {_op: _op
                             ,tileSize: tileSize
                             ,tileGap: tileGap
@@ -2280,6 +2339,7 @@ Elm.GameOfLife.make = function (_elm) {
                             ,Tile: Tile
                             ,GameState: GameState
                             ,Tick: Tick
+                            ,Reset: Reset
                             ,emptyBoard: emptyBoard
                             ,defaultGame: defaultGame
                             ,tileNeighbours: tileNeighbours
@@ -2289,10 +2349,12 @@ Elm.GameOfLife.make = function (_elm) {
                             ,tileWillLiveConway: tileWillLiveConway
                             ,tilePosXDir: tilePosXDir
                             ,tilePosYDir: tilePosYDir
+                            ,getTileFrom: getTileFrom
                             ,display: display
                             ,channelTileUpdate: channelTileUpdate
                             ,channelPlayPause: channelPlayPause
                             ,channelTickGame: channelTickGame
+                            ,channelResetGame: channelResetGame
                             ,updateGame: updateGame
                             ,updateState: updateState
                             ,updateTile: updateTile

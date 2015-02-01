@@ -63,7 +63,7 @@ type alias Game  =  { board: Board
 type State       = Paused | Playing
 
 type TickType    = SingleStep | MultiStep
-type Update      = Tile (Maybe (Int, Int)) | GameState State |Tick (Maybe TickType)
+type Update      = Tile (Maybe (Int, Int)) | GameState State | Tick TickType | Reset
 
 {-----------------------------------
  - Initial state
@@ -168,6 +168,12 @@ tilePosYDir : Int -> Int -> Int
 tilePosYDir y h =   let tileOffsetY = (h - gameHeight) // 2
                     in  (y * (tileSize + tileGap)) + tileOffsetY
 
+getTileFrom : (Int, Int) -> (Int, Int) -> (Int, Int)
+getTileFrom (x, y) (w, h) =
+    let tileOffsetX = (w - gameWidth)  // 2
+        tileOffsetY = (h - gameHeight) // 2
+    in  ((x - tileOffsetX) // (tileSize + tileGap), (y - tileOffsetY) // (tileSize + tileGap))
+
 {-----------------------------------
  - Display
  -----------------------------------}
@@ -177,24 +183,32 @@ display (w, h) game =
         playing         = game.state == Playing
         buttonSymbol    = if playing then "II" else ">"
         newGameState    = if playing then (GameState Paused) else (GameState Playing)
-        playButton = Html.div 
+        playButton      = Html.div 
                         [ HtmlAttr.class "button"
                         , HtmlEv.onClick (send channelPlayPause newGameState)
                         ]
                         [ Html.text buttonSymbol ]
-        nextStepButton = Html.div
+        nextStepButton  = Html.div
                         [ HtmlAttr.classList
                             [ ("button", True)
                             , ("invisible", playing) ]
-                        , HtmlEv.onClick (send channelTickGame (Tick (Just SingleStep)) )
+                        , HtmlEv.onClick (send channelTickGame (Tick SingleStep) )
                         ]
                         [ Html.text ">|" ]
-        sideBar    = Html.div
+        resetButton     = Html.div
+                        [ HtmlAttr.classList
+                            [ ("button", True)
+                            , ("invisible", playing) ]
+                        , HtmlEv.onClick (send channelResetGame Reset )
+                        ]
+                        [ Html.text "R" ]
+        sideBar         = Html.div
                         [ HtmlAttr.id "sidebar"
                         , HtmlAttr.style [("top", (toString (tilePosYDir 0 h)) ++ "px")] ]
                         [ Html.div []
                             [ playButton
-                            , nextStepButton ]
+                            , nextStepButton
+                            , resetButton ]
                         ]
                         |> Html.toElement 150 h
     in  GElement.flow GElement.right
@@ -231,7 +245,10 @@ channelPlayPause : Channel Update
 channelPlayPause = channel (GameState Paused)
 
 channelTickGame : Channel Update
-channelTickGame = channel (Tick Nothing)
+channelTickGame = channel (Tick SingleStep)
+
+channelResetGame : Channel Update
+channelResetGame = channel Reset
 
 -- updates of game-state
 updateGame : Update -> Game -> Game
@@ -240,8 +257,9 @@ updateGame action game =
     in  case action of
             Tile (Just pos)         -> if game.state == Playing then game else updateTile pos game
             GameState state         -> updateState state game
-            Tick (Just MultiStep)   -> if game.state == Playing then updateBoard game else game
-            Tick (Just SingleStep)  -> if game.state == Paused  then updateBoard game else game
+            Tick MultiStep          -> if game.state == Playing then updateBoard game else game
+            Tick SingleStep         -> if game.state == Paused  then updateBoard game else game
+            Reset                   -> defaultGame
             _                       -> game
 
 updateState : State -> Game -> Game
@@ -272,8 +290,14 @@ main = display <~ Window.dimensions
                 ~ foldp updateGame defaultGame (
                         mergeMany   [ subscribe channelTileUpdate
                                     , subscribe channelPlayPause
-                                    , (\_ -> Tick (Just MultiStep) ) <~ (Time.fps 1)
                                     , subscribe channelTickGame
+                                    , subscribe channelResetGame
+                                    , (\_ -> Tick MultiStep ) <~ (Time.fps 1)
+                                    , ( \(x, y) dim ->
+                                            if x < 0 || y < 0
+                                            then Tile Nothing
+                                            else Tile (Just (getTileFrom (x, y) dim))
+                                      ) <~ keepWhen Mouse.isDown (-1, -1) Mouse.position ~ Window.dimensions
                                     ]
                   )
                 -- ~ foldp updateTile defaultGame (subscribe channelTileUpdate)
