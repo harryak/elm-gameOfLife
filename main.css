@@ -13,6 +13,8 @@ body {
     font-weight: bolder;
     cursor: pointer;
     opacity: 0.8;
+    float: left;
+    margin: 0 8px 10px 0;
 }
 
 .button:hover {
@@ -36,8 +38,10 @@ div:has(> div#sidebar) {
     border-radius: 10px;
 }
 
-#sidebar > div > * {
-    margin-bottom: 10px;
+#sidebar > div:after {
+    clear: both;
+    display: block;
+    content: "";
 }
 
 div.tile {
