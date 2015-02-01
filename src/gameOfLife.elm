@@ -6,7 +6,6 @@ import Window
 import Graphics.Element as GElement
 import Graphics.Collage as GCollage
 import Graphics.Input as GInput
-import Color
 import Signal (..)
 import Text
 import Time
@@ -22,36 +21,7 @@ import Html.Events as HtmlEv
 
 -- own modules
 import ListExtension as LEx
-
-{-----------------------------------
- - Config
- -----------------------------------}
-tileSize : Int
-tileSize = 18
-
-tileGap : Int
-tileGap = 2
-
-tileColorOn : Color.Color
-tileColorOn = Color.black
-
-tileColorOff : Color.Color
-tileColorOff = Color.green
-
-gameWidth : Int
-gameWidth = 800
-
-gameHeight : Int
-gameHeight = 600
-
-{-----------------------------------
- - Calculated config
- -----------------------------------}
-tileNumberXDir : Int
-tileNumberXDir = gameWidth // tileSize
-
-tileNumberYDir : Int
-tileNumberYDir = gameHeight // tileSize
+import GameOfLifeConfig (..)
 
 {-----------------------------------
  - Models

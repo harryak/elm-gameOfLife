@@ -1786,9 +1786,9 @@ Elm.GameOfLife.make = function (_elm) {
    _P = _N.Ports.make(_elm),
    $moduleName = "GameOfLife",
    $Basics = Elm.Basics.make(_elm),
-   $Color = Elm.Color.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
+   $GameOfLifeConfig = Elm.GameOfLifeConfig.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
@@ -1825,21 +1825,267 @@ Elm.GameOfLife.make = function (_elm) {
                          ,newState]],
       game);
    });
+   var getTileFrom = F2(function (_v2,
+   _v3) {
+      return function () {
+         switch (_v3.ctor)
+         {case "_Tuple2":
+            return function () {
+                 switch (_v2.ctor)
+                 {case "_Tuple2":
+                    return function () {
+                         var tileOffsetY = (_v3._1 - $GameOfLifeConfig.gameHeight) / 2 | 0;
+                         var tileOffsetX = (_v3._0 - $GameOfLifeConfig.gameWidth) / 2 | 0;
+                         return {ctor: "_Tuple2"
+                                ,_0: (_v2._0 - tileOffsetX) / ($GameOfLifeConfig.tileSize + $GameOfLifeConfig.tileGap) | 0
+                                ,_1: (_v2._1 - tileOffsetY) / ($GameOfLifeConfig.tileSize + $GameOfLifeConfig.tileGap) | 0};
+                      }();}
+                 _U.badCase($moduleName,
+                 "between lines 143 and 145");
+              }();}
+         _U.badCase($moduleName,
+         "between lines 143 and 145");
+      }();
+   });
+   var tilePosYDir = F2(function (y,
+   h) {
+      return function () {
+         var tileOffsetY = (h - $GameOfLifeConfig.gameHeight) / 2 | 0;
+         return y * ($GameOfLifeConfig.tileSize + $GameOfLifeConfig.tileGap) + tileOffsetY;
+      }();
+   });
+   var tilePosXDir = F2(function (x,
+   w) {
+      return function () {
+         var tileOffsetX = (w - $GameOfLifeConfig.gameWidth) / 2 | 0;
+         return x * ($GameOfLifeConfig.tileSize + $GameOfLifeConfig.tileGap) + tileOffsetX;
+      }();
+   });
    var tileLivesAndThen = F3(function (key,
    dict,
-   _v2) {
+   _v10) {
       return function () {
-         switch (_v2.ctor)
+         switch (_v10.ctor)
          {case "_Tuple2":
             return A2($Maybe.andThen,
               A2($Dict.get,key,dict),
               function (bool) {
-                 return bool ? _v2._0 : _v2._1;
+                 return bool ? _v10._0 : _v10._1;
               });}
          _U.badCase($moduleName,
-         "between lines 126 and 127");
+         "between lines 96 and 97");
       }();
    });
+   var tileNeighbours = function (_v14) {
+      return function () {
+         switch (_v14.ctor)
+         {case "_Tuple2":
+            return function () {
+                 var sy = _v14._1 + 1;
+                 var py = _v14._1 - 1;
+                 var sx = _v14._0 + 1;
+                 var px = _v14._0 - 1;
+                 return _U.cmp(_v14._0,
+                 0) > 0 ? _U.cmp(_v14._1,
+                 0) > 0 ? _U.cmp(_v14._0,
+                 $GameOfLifeConfig.tileNumberXDir) < 0 ? _U.cmp(_v14._1,
+                 $GameOfLifeConfig.tileNumberYDir) < 0 ? _L.fromArray([{ctor: "_Tuple2"
+                                                                       ,_0: px
+                                                                       ,_1: py}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: px
+                                                                       ,_1: _v14._1}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: px
+                                                                       ,_1: sy}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: _v14._0
+                                                                       ,_1: py}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: _v14._0
+                                                                       ,_1: sy}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: sx
+                                                                       ,_1: py}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: sx
+                                                                       ,_1: _v14._1}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: sx
+                                                                       ,_1: sy}]) : _L.fromArray([{ctor: "_Tuple2"
+                                                                                                  ,_0: px
+                                                                                                  ,_1: py}
+                                                                                                 ,{ctor: "_Tuple2"
+                                                                                                  ,_0: px
+                                                                                                  ,_1: _v14._1}
+                                                                                                 ,{ctor: "_Tuple2"
+                                                                                                  ,_0: _v14._0
+                                                                                                  ,_1: py}
+                                                                                                 ,{ctor: "_Tuple2"
+                                                                                                  ,_0: sx
+                                                                                                  ,_1: py}
+                                                                                                 ,{ctor: "_Tuple2"
+                                                                                                  ,_0: sx
+                                                                                                  ,_1: _v14._1}]) : _U.cmp(_v14._1,
+                 $GameOfLifeConfig.tileNumberYDir) < 0 ? _L.fromArray([{ctor: "_Tuple2"
+                                                                       ,_0: px
+                                                                       ,_1: py}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: px
+                                                                       ,_1: _v14._1}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: px
+                                                                       ,_1: sy}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: _v14._0
+                                                                       ,_1: py}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: _v14._0
+                                                                       ,_1: sy}]) : _L.fromArray([{ctor: "_Tuple2"
+                                                                                                  ,_0: px
+                                                                                                  ,_1: py}
+                                                                                                 ,{ctor: "_Tuple2"
+                                                                                                  ,_0: px
+                                                                                                  ,_1: _v14._1}
+                                                                                                 ,{ctor: "_Tuple2"
+                                                                                                  ,_0: _v14._0
+                                                                                                  ,_1: py}]) : _U.cmp(_v14._0,
+                 $GameOfLifeConfig.tileNumberXDir) < 0 ? _L.fromArray([{ctor: "_Tuple2"
+                                                                       ,_0: px
+                                                                       ,_1: _v14._1}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: px
+                                                                       ,_1: sy}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: _v14._0
+                                                                       ,_1: sy}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: sx
+                                                                       ,_1: _v14._1}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: sx
+                                                                       ,_1: sy}]) : _L.fromArray([{ctor: "_Tuple2"
+                                                                                                  ,_0: px
+                                                                                                  ,_1: _v14._1}
+                                                                                                 ,{ctor: "_Tuple2"
+                                                                                                  ,_0: px
+                                                                                                  ,_1: sy}
+                                                                                                 ,{ctor: "_Tuple2"
+                                                                                                  ,_0: _v14._0
+                                                                                                  ,_1: sy}]) : _U.cmp(_v14._1,
+                 0) > 0 ? _U.cmp(_v14._1,
+                 $GameOfLifeConfig.tileNumberYDir) < 0 ? _L.fromArray([{ctor: "_Tuple2"
+                                                                       ,_0: _v14._0
+                                                                       ,_1: py}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: _v14._0
+                                                                       ,_1: sy}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: sx
+                                                                       ,_1: py}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: sx
+                                                                       ,_1: _v14._1}
+                                                                      ,{ctor: "_Tuple2"
+                                                                       ,_0: sx
+                                                                       ,_1: sy}]) : _L.fromArray([{ctor: "_Tuple2"
+                                                                                                  ,_0: _v14._0
+                                                                                                  ,_1: py}
+                                                                                                 ,{ctor: "_Tuple2"
+                                                                                                  ,_0: sx
+                                                                                                  ,_1: py}
+                                                                                                 ,{ctor: "_Tuple2"
+                                                                                                  ,_0: sx
+                                                                                                  ,_1: _v14._1}]) : _L.fromArray([{ctor: "_Tuple2"
+                                                                                                                                  ,_0: _v14._0
+                                                                                                                                  ,_1: sy}
+                                                                                                                                 ,{ctor: "_Tuple2"
+                                                                                                                                  ,_0: sx
+                                                                                                                                  ,_1: _v14._1}
+                                                                                                                                 ,{ctor: "_Tuple2"
+                                                                                                                                  ,_0: sx
+                                                                                                                                  ,_1: sy}]);
+              }();}
+         _U.badCase($moduleName,
+         "between lines 59 and 91");
+      }();
+   };
+   var getAliveTilesAround = F2(function (pos,
+   dict) {
+      return $List.sum(A2($List.filterMap,
+      function (pos$) {
+         return A3(tileLivesAndThen,
+         pos$,
+         dict,
+         {ctor: "_Tuple2"
+         ,_0: $Maybe.Just(1)
+         ,_1: $Maybe.Just(0)});
+      },
+      tileNeighbours(pos)));
+   });
+   var tileWillLive = F3(function (_v18,
+   pos,
+   dict) {
+      return function () {
+         switch (_v18.ctor)
+         {case "_Tuple3":
+            return A2($Maybe.andThen,
+              A2($Dict.get,pos,dict),
+              function (curLives) {
+                 return function () {
+                    var aliveTilesAround = A2(getAliveTilesAround,
+                    pos,
+                    dict);
+                    return curLives ? _U.cmp(aliveTilesAround,
+                    _v18._0) > 0 && _U.cmp(aliveTilesAround,
+                    _v18._1) < 0 ? $Maybe.Just(true) : $Maybe.Just(false) : _U.eq(aliveTilesAround,
+                    _v18._2) ? $Maybe.Just(true) : $Maybe.Just(false);
+                 }();
+              });}
+         _U.badCase($moduleName,
+         "between lines 116 and 124");
+      }();
+   });
+   var tileWillLiveConway = tileWillLive({ctor: "_Tuple3"
+                                         ,_0: 1
+                                         ,_1: 4
+                                         ,_2: 3});
+   var updateBoard = function (game) {
+      return function () {
+         var newBoard = A2($Dict.map,
+         F2(function (pos,val) {
+            return function () {
+               var _v23 = A2(tileWillLiveConway,
+               pos,
+               game.board);
+               switch (_v23.ctor)
+               {case "Just": return _v23._0;}
+               return val;
+            }();
+         }),
+         game.board);
+         return _U.replace([["board"
+                            ,newBoard]],
+         game);
+      }();
+   };
+   var emptyBoard = $Dict.fromList(A3($ListExtension.cartesianProduct,
+   F2(function (v0,v1) {
+      return {ctor: "_Tuple2"
+             ,_0: v0
+             ,_1: v1};
+   }),
+   A3($ListExtension.cartesianProduct,
+   F2(function (v0,v1) {
+      return {ctor: "_Tuple2"
+             ,_0: v0
+             ,_1: v1};
+   }),
+   _L.range(0,
+   $GameOfLifeConfig.tileNumberXDir),
+   _L.range(0,
+   $GameOfLifeConfig.tileNumberYDir)),
+   _L.fromArray([false])));
    var Reset = {ctor: "Reset"};
    var channelResetGame = $Signal.channel(Reset);
    var Tick = function (a) {
@@ -1858,308 +2104,15 @@ Elm.GameOfLife.make = function (_elm) {
    var channelTickGame = $Signal.channel(Tick(SingleStep));
    var Playing = {ctor: "Playing"};
    var Paused = {ctor: "Paused"};
-   var channelPlayPause = $Signal.channel(GameState(Paused));
-   var Game = F3(function (a,b,c) {
-      return {_: {}
-             ,board: a
-             ,speed: c
-             ,state: b};
-   });
-   var gameHeight = 600;
-   var gameWidth = 800;
-   var tileColorOff = $Color.green;
-   var tileColorOn = $Color.black;
-   var tileGap = 2;
-   var tileSize = 18;
-   var tileNumberXDir = gameWidth / tileSize | 0;
-   var tileNumberYDir = gameHeight / tileSize | 0;
-   var emptyBoard = $Dict.fromList(A3($ListExtension.cartesianProduct,
-   F2(function (v0,v1) {
-      return {ctor: "_Tuple2"
-             ,_0: v0
-             ,_1: v1};
-   }),
-   A3($ListExtension.cartesianProduct,
-   F2(function (v0,v1) {
-      return {ctor: "_Tuple2"
-             ,_0: v0
-             ,_1: v1};
-   }),
-   _L.range(0,tileNumberXDir),
-   _L.range(0,tileNumberYDir)),
-   _L.fromArray([false])));
    var defaultGame = {_: {}
                      ,board: emptyBoard
                      ,speed: 0.5
                      ,state: Paused};
-   var tileNeighbours = function (_v6) {
-      return function () {
-         switch (_v6.ctor)
-         {case "_Tuple2":
-            return function () {
-                 var sy = _v6._1 + 1;
-                 var py = _v6._1 - 1;
-                 var sx = _v6._0 + 1;
-                 var px = _v6._0 - 1;
-                 return _U.cmp(_v6._0,
-                 0) > 0 ? _U.cmp(_v6._1,
-                 0) > 0 ? _U.cmp(_v6._0,
-                 tileNumberXDir) < 0 ? _U.cmp(_v6._1,
-                 tileNumberYDir) < 0 ? _L.fromArray([{ctor: "_Tuple2"
-                                                     ,_0: px
-                                                     ,_1: py}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: px
-                                                     ,_1: _v6._1}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: px
-                                                     ,_1: sy}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: _v6._0
-                                                     ,_1: py}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: _v6._0
-                                                     ,_1: sy}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: sx
-                                                     ,_1: py}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: sx
-                                                     ,_1: _v6._1}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: sx
-                                                     ,_1: sy}]) : _L.fromArray([{ctor: "_Tuple2"
-                                                                                ,_0: px
-                                                                                ,_1: py}
-                                                                               ,{ctor: "_Tuple2"
-                                                                                ,_0: px
-                                                                                ,_1: _v6._1}
-                                                                               ,{ctor: "_Tuple2"
-                                                                                ,_0: _v6._0
-                                                                                ,_1: py}
-                                                                               ,{ctor: "_Tuple2"
-                                                                                ,_0: sx
-                                                                                ,_1: py}
-                                                                               ,{ctor: "_Tuple2"
-                                                                                ,_0: sx
-                                                                                ,_1: _v6._1}]) : _U.cmp(_v6._1,
-                 tileNumberYDir) < 0 ? _L.fromArray([{ctor: "_Tuple2"
-                                                     ,_0: px
-                                                     ,_1: py}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: px
-                                                     ,_1: _v6._1}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: px
-                                                     ,_1: sy}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: _v6._0
-                                                     ,_1: py}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: _v6._0
-                                                     ,_1: sy}]) : _L.fromArray([{ctor: "_Tuple2"
-                                                                                ,_0: px
-                                                                                ,_1: py}
-                                                                               ,{ctor: "_Tuple2"
-                                                                                ,_0: px
-                                                                                ,_1: _v6._1}
-                                                                               ,{ctor: "_Tuple2"
-                                                                                ,_0: _v6._0
-                                                                                ,_1: py}]) : _U.cmp(_v6._0,
-                 tileNumberXDir) < 0 ? _L.fromArray([{ctor: "_Tuple2"
-                                                     ,_0: px
-                                                     ,_1: _v6._1}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: px
-                                                     ,_1: sy}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: _v6._0
-                                                     ,_1: sy}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: sx
-                                                     ,_1: _v6._1}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: sx
-                                                     ,_1: sy}]) : _L.fromArray([{ctor: "_Tuple2"
-                                                                                ,_0: px
-                                                                                ,_1: _v6._1}
-                                                                               ,{ctor: "_Tuple2"
-                                                                                ,_0: px
-                                                                                ,_1: sy}
-                                                                               ,{ctor: "_Tuple2"
-                                                                                ,_0: _v6._0
-                                                                                ,_1: sy}]) : _U.cmp(_v6._1,
-                 0) > 0 ? _U.cmp(_v6._1,
-                 tileNumberYDir) < 0 ? _L.fromArray([{ctor: "_Tuple2"
-                                                     ,_0: _v6._0
-                                                     ,_1: py}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: _v6._0
-                                                     ,_1: sy}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: sx
-                                                     ,_1: py}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: sx
-                                                     ,_1: _v6._1}
-                                                    ,{ctor: "_Tuple2"
-                                                     ,_0: sx
-                                                     ,_1: sy}]) : _L.fromArray([{ctor: "_Tuple2"
-                                                                                ,_0: _v6._0
-                                                                                ,_1: py}
-                                                                               ,{ctor: "_Tuple2"
-                                                                                ,_0: sx
-                                                                                ,_1: py}
-                                                                               ,{ctor: "_Tuple2"
-                                                                                ,_0: sx
-                                                                                ,_1: _v6._1}]) : _L.fromArray([{ctor: "_Tuple2"
-                                                                                                               ,_0: _v6._0
-                                                                                                               ,_1: sy}
-                                                                                                              ,{ctor: "_Tuple2"
-                                                                                                               ,_0: sx
-                                                                                                               ,_1: _v6._1}
-                                                                                                              ,{ctor: "_Tuple2"
-                                                                                                               ,_0: sx
-                                                                                                               ,_1: sy}]);
-              }();}
-         _U.badCase($moduleName,
-         "between lines 89 and 121");
-      }();
-   };
-   var getAliveTilesAround = F2(function (pos,
-   dict) {
-      return $List.sum(A2($List.filterMap,
-      function (pos$) {
-         return A3(tileLivesAndThen,
-         pos$,
-         dict,
-         {ctor: "_Tuple2"
-         ,_0: $Maybe.Just(1)
-         ,_1: $Maybe.Just(0)});
-      },
-      tileNeighbours(pos)));
-   });
-   var tileWillLive = F3(function (_v10,
-   pos,
-   dict) {
-      return function () {
-         switch (_v10.ctor)
-         {case "_Tuple3":
-            return A2($Maybe.andThen,
-              A2($Dict.get,pos,dict),
-              function (curLives) {
-                 return function () {
-                    var aliveTilesAround = A2(getAliveTilesAround,
-                    pos,
-                    dict);
-                    return curLives ? _U.cmp(aliveTilesAround,
-                    _v10._0) > 0 && _U.cmp(aliveTilesAround,
-                    _v10._1) < 0 ? $Maybe.Just(true) : $Maybe.Just(false) : _U.eq(aliveTilesAround,
-                    _v10._2) ? $Maybe.Just(true) : $Maybe.Just(false);
-                 }();
-              });}
-         _U.badCase($moduleName,
-         "between lines 146 and 154");
-      }();
-   });
-   var tileWillLiveConway = tileWillLive({ctor: "_Tuple3"
-                                         ,_0: 1
-                                         ,_1: 4
-                                         ,_2: 3});
-   var updateBoard = function (game) {
-      return function () {
-         var newBoard = A2($Dict.map,
-         F2(function (pos,val) {
-            return function () {
-               var _v15 = A2(tileWillLiveConway,
-               pos,
-               game.board);
-               switch (_v15.ctor)
-               {case "Just": return _v15._0;}
-               return val;
-            }();
-         }),
-         game.board);
-         return _U.replace([["board"
-                            ,newBoard]],
-         game);
-      }();
-   };
-   var updateGame = F2(function (action,
+   var channelPlayPause = $Signal.channel(GameState(Paused));
+   var display = F2(function (_v25,
    game) {
       return function () {
-         var _ = A2($Debug.watch,
-         "action",
-         action);
-         return function () {
-            switch (action.ctor)
-            {case "GameState":
-               return A2(updateState,
-                 action._0,
-                 game);
-               case "Reset":
-               return defaultGame;
-               case "Tick":
-               switch (action._0.ctor)
-                 {case "MultiStep":
-                    return _U.eq(game.state,
-                      Playing) ? updateBoard(game) : game;
-                    case "SingleStep":
-                    return _U.eq(game.state,
-                      Paused) ? updateBoard(game) : game;}
-                 break;
-               case "Tile":
-               switch (action._0.ctor)
-                 {case "Just":
-                    return _U.eq(game.state,
-                      Playing) ? game : A2(updateTile,
-                      action._0._0,
-                      game);}
-                 break;}
-            return game;
-         }();
-      }();
-   });
-   var tilePosXDir = F2(function (x,
-   w) {
-      return function () {
-         var tileOffsetX = (w - gameWidth) / 2 | 0;
-         return x * (tileSize + tileGap) + tileOffsetX;
-      }();
-   });
-   var tilePosYDir = F2(function (y,
-   h) {
-      return function () {
-         var tileOffsetY = (h - gameHeight) / 2 | 0;
-         return y * (tileSize + tileGap) + tileOffsetY;
-      }();
-   });
-   var getTileFrom = F2(function (_v22,
-   _v23) {
-      return function () {
-         switch (_v23.ctor)
-         {case "_Tuple2":
-            return function () {
-                 switch (_v22.ctor)
-                 {case "_Tuple2":
-                    return function () {
-                         var tileOffsetY = (_v23._1 - gameHeight) / 2 | 0;
-                         var tileOffsetX = (_v23._0 - gameWidth) / 2 | 0;
-                         return {ctor: "_Tuple2"
-                                ,_0: (_v22._0 - tileOffsetX) / (tileSize + tileGap) | 0
-                                ,_1: (_v22._1 - tileOffsetY) / (tileSize + tileGap) | 0};
-                      }();}
-                 _U.badCase($moduleName,
-                 "between lines 173 and 175");
-              }();}
-         _U.badCase($moduleName,
-         "between lines 173 and 175");
-      }();
-   });
-   var display = F2(function (_v30,
-   game) {
-      return function () {
-         switch (_v30.ctor)
+         switch (_v25.ctor)
          {case "_Tuple2":
             return function () {
                  var playing = _U.eq(game.state,
@@ -2196,14 +2149,14 @@ Elm.GameOfLife.make = function (_elm) {
                  _L.fromArray([$Html.text("R")]));
                  var sideBar = A2($Html.toElement,
                  150,
-                 _v30._1)(A2($Html.div,
+                 _v25._1)(A2($Html.div,
                  _L.fromArray([$Html$Attributes.id("sidebar")
                               ,$Html$Attributes.style(_L.fromArray([{ctor: "_Tuple2"
                                                                     ,_0: "top"
                                                                     ,_1: A2($Basics._op["++"],
                                                                     $Basics.toString(A2(tilePosYDir,
                                                                     0,
-                                                                    _v30._1)),
+                                                                    _v25._1)),
                                                                     "px")}]))]),
                  _L.fromArray([A2($Html.div,
                  _L.fromArray([]),
@@ -2217,23 +2170,23 @@ Elm.GameOfLife.make = function (_elm) {
                  $Graphics$Element.right,
                  _L.fromArray([sideBar
                               ,A2($Html.toElement,
-                              gameWidth,
-                              gameHeight)(A2($Html.div,
+                              $GameOfLifeConfig.gameWidth,
+                              $GameOfLifeConfig.gameHeight)(A2($Html.div,
                               _L.fromArray([$Html$Attributes.id("boardContainer")]),
                               A2($List.map,
-                              function (_v34) {
+                              function (_v29) {
                                  return function () {
-                                    switch (_v34.ctor)
+                                    switch (_v29.ctor)
                                     {case "_Tuple2":
-                                       switch (_v34._0.ctor)
+                                       switch (_v29._0.ctor)
                                          {case "_Tuple2":
                                             return function () {
                                                  var yPos = A2(tilePosYDir,
-                                                 _v34._0._1,
-                                                 _v30._1);
+                                                 _v29._0._1,
+                                                 _v25._1);
                                                  var xPos = A2(tilePosXDir,
-                                                 _v34._0._0,
-                                                 _v30._0);
+                                                 _v29._0._0,
+                                                 _v25._0);
                                                  return A2($Html.div,
                                                  _L.fromArray([$Html$Attributes.style(_L.fromArray([{ctor: "_Tuple2"
                                                                                                     ,_0: "left"
@@ -2248,38 +2201,73 @@ Elm.GameOfLife.make = function (_elm) {
                                                                                                    ,{ctor: "_Tuple2"
                                                                                                     ,_0: "height"
                                                                                                     ,_1: A2($Basics._op["++"],
-                                                                                                    $Basics.toString(tileSize),
+                                                                                                    $Basics.toString($GameOfLifeConfig.tileSize),
                                                                                                     "px")}
                                                                                                    ,{ctor: "_Tuple2"
                                                                                                     ,_0: "width"
                                                                                                     ,_1: A2($Basics._op["++"],
-                                                                                                    $Basics.toString(tileSize),
+                                                                                                    $Basics.toString($GameOfLifeConfig.tileSize),
                                                                                                     "px")}]))
                                                               ,$Html$Attributes.classList(_L.fromArray([{ctor: "_Tuple2"
                                                                                                         ,_0: "tile"
                                                                                                         ,_1: true}
                                                                                                        ,{ctor: "_Tuple2"
                                                                                                         ,_0: "alive"
-                                                                                                        ,_1: _v34._1}
+                                                                                                        ,_1: _v29._1}
                                                                                                        ,{ctor: "_Tuple2"
                                                                                                         ,_0: "dead"
-                                                                                                        ,_1: $Basics.not(_v34._1)}]))
+                                                                                                        ,_1: $Basics.not(_v29._1)}]))
                                                               ,$Html$Events.onClick(A2($Signal.send,
                                                               channelTileUpdate,
                                                               Tile($Maybe.Just({ctor: "_Tuple2"
-                                                                               ,_0: _v34._0._0
-                                                                               ,_1: _v34._0._1}))))]),
+                                                                               ,_0: _v29._0._0
+                                                                               ,_1: _v29._0._1}))))]),
                                                  _L.fromArray([]));
                                               }();}
                                          break;}
                                     _U.badCase($moduleName,
-                                    "between lines 219 and 234");
+                                    "between lines 189 and 204");
                                  }();
                               },
                               $Dict.toList(game.board))))]));
               }();}
          _U.badCase($moduleName,
-         "between lines 182 and 236");
+         "between lines 152 and 206");
+      }();
+   });
+   var updateGame = F2(function (action,
+   game) {
+      return function () {
+         var _ = A2($Debug.watch,
+         "action",
+         action);
+         return function () {
+            switch (action.ctor)
+            {case "GameState":
+               return A2(updateState,
+                 action._0,
+                 game);
+               case "Reset":
+               return defaultGame;
+               case "Tick":
+               switch (action._0.ctor)
+                 {case "MultiStep":
+                    return _U.eq(game.state,
+                      Playing) ? updateBoard(game) : game;
+                    case "SingleStep":
+                    return _U.eq(game.state,
+                      Paused) ? updateBoard(game) : game;}
+                 break;
+               case "Tile":
+               switch (action._0.ctor)
+                 {case "Just":
+                    return _U.eq(game.state,
+                      Playing) ? game : A2(updateTile,
+                      action._0._0,
+                      game);}
+                 break;}
+            return game;
+         }();
       }();
    });
    var main = A2($Signal._op["~"],
@@ -2314,7 +2302,7 @@ Elm.GameOfLife.make = function (_elm) {
                                              ,_1: _v42._1},
                                              dim)));}
                                         _U.badCase($moduleName,
-                                        "between lines 297 and 299");
+                                        "between lines 267 and 269");
                                      }();
                                   }),
                                   A3($Signal.keepWhen,
@@ -2322,15 +2310,13 @@ Elm.GameOfLife.make = function (_elm) {
                                   {ctor: "_Tuple2",_0: -1,_1: -1},
                                   $Mouse.position)),
                                   $Window.dimensions)]))));
+   var Game = F3(function (a,b,c) {
+      return {_: {}
+             ,board: a
+             ,speed: c
+             ,state: b};
+   });
    _elm.GameOfLife.values = {_op: _op
-                            ,tileSize: tileSize
-                            ,tileGap: tileGap
-                            ,tileColorOn: tileColorOn
-                            ,tileColorOff: tileColorOff
-                            ,gameWidth: gameWidth
-                            ,gameHeight: gameHeight
-                            ,tileNumberXDir: tileNumberXDir
-                            ,tileNumberYDir: tileNumberYDir
                             ,Game: Game
                             ,Paused: Paused
                             ,Playing: Playing
@@ -2361,6 +2347,38 @@ Elm.GameOfLife.make = function (_elm) {
                             ,updateBoard: updateBoard
                             ,main: main};
    return _elm.GameOfLife.values;
+};Elm.GameOfLifeConfig = Elm.GameOfLifeConfig || {};
+Elm.GameOfLifeConfig.make = function (_elm) {
+   "use strict";
+   _elm.GameOfLifeConfig = _elm.GameOfLifeConfig || {};
+   if (_elm.GameOfLifeConfig.values)
+   return _elm.GameOfLifeConfig.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   _P = _N.Ports.make(_elm),
+   $moduleName = "GameOfLifeConfig",
+   $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm);
+   var gameHeight = 600;
+   var gameWidth = 800;
+   var tileColorOff = $Color.green;
+   var tileColorOn = $Color.black;
+   var tileGap = 2;
+   var tileSize = 18;
+   var tileNumberXDir = gameWidth / tileSize | 0;
+   var tileNumberYDir = gameHeight / tileSize | 0;
+   _elm.GameOfLifeConfig.values = {_op: _op
+                                  ,tileSize: tileSize
+                                  ,tileGap: tileGap
+                                  ,tileColorOn: tileColorOn
+                                  ,tileColorOff: tileColorOff
+                                  ,gameWidth: gameWidth
+                                  ,gameHeight: gameHeight
+                                  ,tileNumberXDir: tileNumberXDir
+                                  ,tileNumberYDir: tileNumberYDir};
+   return _elm.GameOfLifeConfig.values;
 };Elm.Graphics = Elm.Graphics || {};
 Elm.Graphics.Collage = Elm.Graphics.Collage || {};
 Elm.Graphics.Collage.make = function (_elm) {
