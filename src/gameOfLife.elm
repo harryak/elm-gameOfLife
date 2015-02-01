@@ -183,7 +183,9 @@ display (w, h) game =
                         ]
                         [ Html.text buttonSymbol ]
         nextStepButton = Html.div
-                        [ HtmlAttr.class "button"
+                        [ HtmlAttr.classList
+                            [ ("button", True)
+                            , ("invisible", playing) ]
                         , HtmlEv.onClick (send channelTickGame (Tick (Just SingleStep)) )
                         ]
                         [ Html.text ">|" ]

@@ -2138,12 +2138,6 @@ Elm.GameOfLife.make = function (_elm) {
          switch (_v23.ctor)
          {case "_Tuple2":
             return function () {
-                 var nextStepButton = A2($Html.div,
-                 _L.fromArray([$Html$Attributes.$class("button")
-                              ,$Html$Events.onClick(A2($Signal.send,
-                              channelTickGame,
-                              Tick($Maybe.Just(SingleStep))))]),
-                 _L.fromArray([$Html.text(">|")]));
                  var playing = _U.eq(game.state,
                  Playing);
                  var buttonSymbol = playing ? "II" : ">";
@@ -2154,6 +2148,17 @@ Elm.GameOfLife.make = function (_elm) {
                               channelPlayPause,
                               newGameState))]),
                  _L.fromArray([$Html.text(buttonSymbol)]));
+                 var nextStepButton = A2($Html.div,
+                 _L.fromArray([$Html$Attributes.classList(_L.fromArray([{ctor: "_Tuple2"
+                                                                        ,_0: "button"
+                                                                        ,_1: true}
+                                                                       ,{ctor: "_Tuple2"
+                                                                        ,_0: "invisible"
+                                                                        ,_1: playing}]))
+                              ,$Html$Events.onClick(A2($Signal.send,
+                              channelTickGame,
+                              Tick($Maybe.Just(SingleStep))))]),
+                 _L.fromArray([$Html.text(">|")]));
                  var sideBar = A2($Html.toElement,
                  150,
                  _v23._1)(A2($Html.div,
@@ -2232,13 +2237,13 @@ Elm.GameOfLife.make = function (_elm) {
                                               }();}
                                          break;}
                                     _U.badCase($moduleName,
-                                    "between lines 203 and 218");
+                                    "between lines 205 and 220");
                                  }();
                               },
                               $Dict.toList(game.board))))]));
               }();}
          _U.badCase($moduleName,
-         "between lines 176 and 220");
+         "between lines 176 and 222");
       }();
    });
    var main = A2($Signal._op["~"],

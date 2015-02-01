@@ -16,7 +16,6 @@ body {
 }
 
 .button:hover {
-    font-size: 30pt;
     opacity: 0.95;
 }
 
@@ -59,4 +58,8 @@ div.tile.alive {
 
 div.tile.dead {
     background-color: #EFCC00;
+}
+
+.invisible {
+    display: none;
 }
