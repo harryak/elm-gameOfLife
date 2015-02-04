@@ -1,20 +1,21 @@
 module GameOfLife where
 
--- The imports
-import Mouse
-import Window
+-- The imports from core libraries
+import Dict
 import Graphics.Element as GElement
 import Graphics.Collage as GCollage
 import Graphics.Input as GInput
-import Signal (..)
-import Text
-import Time
-import Dict
 import List
 import Maybe
+import Mouse
+import Random
+import Signal ((<~), (~))               -- can not use this otherwise
+import Signal
+import Text
+import Time
+import Window
 
-import Debug
-
+-- imports from comunity packages
 import Html
 import Html.Attributes as HtmlAttr
 import Html.Events as HtmlEv
@@ -32,7 +33,7 @@ type alias Game  =  { board: Board
 type State       = Paused | Playing
 
 type TickType    = SingleStep | MultiStep
-type Update      = Tile (Maybe (Int, Int)) | GameState State | Tick TickType | Reset
+type Update      = Tile (Maybe (Int, Int)) | NewBoard Board | GameState State | Tick TickType | Reset
 
 {-----------------------------------
  - Initial state
@@ -40,13 +41,24 @@ type Update      = Tile (Maybe (Int, Int)) | GameState State | Tick TickType | R
 -- Use configuration to create the empty board.
 emptyBoard : Board
 emptyBoard =    LEx.cartesianProduct (,) (
-                    LEx.cartesianProduct (,) [0..tileNumberXDir] [0..tileNumberYDir]
+                    LEx.cartesianProduct (,) [0..(tileNumberXDir - 1)] [0..(tileNumberYDir - 1)]
                 ) [False]
                     |>  Dict.fromList
 
 defaultGame : Game
 defaultGame =   { board = emptyBoard
                 , state = Paused }
+
+{-----------------------------------
+ - Random board generation
+ -----------------------------------}
+randomBoard : Random.Seed -> Board
+randomBoard seed = 
+    let possibleCoordinates = LEx.cartesianProduct (,) [0..(tileNumberXDir - 1)] [0..(tileNumberYDir - 1)]
+        (randomValues, _)   = Random.generate (Random.list (tileNumberXDir * tileNumberYDir) (Random.int 0 1)) seed
+        boardList           = LEx.zip possibleCoordinates randomValues
+                                |> List.map (\(pos, flag) -> (pos, flag > 0))
+    in  Dict.fromList boardList
 
 {-----------------------------------
  - Game rules
@@ -144,38 +156,45 @@ getTileFrom (x, y) (w, h) =
 {-----------------------------------
  - Display
  -----------------------------------}
-display : (Int, Int) -> Game -> GElement.Element
-display (w, h) game =
-    let _               = Debug.watch "game" game.state
-        playing         = game.state == Playing
+display : (Int, Int) -> Game -> Random.Seed -> GElement.Element
+display (w, h) game initSeed =
+    let playing         = game.state == Playing
         buttonSymbol    = if playing then "II" else ">"
         newGameState    = if playing then (GameState Paused) else (GameState Playing)
         playButton      = Html.div 
                         [ HtmlAttr.class "button"
-                        , HtmlEv.onClick (send channelPlayPause newGameState)
+                        , HtmlEv.onClick (Signal.send channelPlayPause newGameState)
                         ]
                         [ Html.text buttonSymbol ]
         nextStepButton  = Html.div
                         [ HtmlAttr.classList
                             [ ("button", True)
                             , ("invisible", playing) ]
-                        , HtmlEv.onClick (send channelTickGame (Tick SingleStep) )
+                        , HtmlEv.onClick (Signal.send channelTickGame (Tick SingleStep) )
                         ]
                         [ Html.text ">|" ]
         resetButton     = Html.div
                         [ HtmlAttr.classList
                             [ ("button", True)
                             , ("invisible", playing) ]
-                        , HtmlEv.onClick (send channelResetGame Reset )
+                        , HtmlEv.onClick (Signal.send channelResetGame Reset )
                         ]
                         [ Html.text "R" ]
+        randomButton    = Html.div
+                        [ HtmlAttr.classList
+                            [ ("button", True)
+                            , ("invisible", playing) ]
+                        , HtmlEv.onClick (Signal.send channelRandomBoard (NewBoard (randomBoard initSeed)) )
+                        ]
+                        [ Html.text "Z" ]
         sideBar         = Html.div
                         [ HtmlAttr.id "sidebar"
                         , HtmlAttr.style [("top", (toString (tilePosYDir 0 h)) ++ "px")] ]
                         [ Html.div []
                             [ playButton
                             , nextStepButton
-                            , resetButton ]
+                            , resetButton
+                            , randomButton ]
                         ]
                         |> Html.toElement 150 h
     in  GElement.flow GElement.right
@@ -197,7 +216,7 @@ display (w, h) game =
                                     , ("alive", alive)
                                     , ("dead", not alive)
                                     ]
-                                , HtmlEv.onClick (send channelTileUpdate (Tile (Just (x, y))) )
+                                , HtmlEv.onClick (Signal.send channelTileUpdate (Tile (Just (x, y))) )
                                 ] [ ]
                 ) (Dict.toList game.board)) |> Html.toElement gameWidth gameHeight
             ]
@@ -205,29 +224,32 @@ display (w, h) game =
 {-----------------------------------
  - Channels and Signals
  -----------------------------------}
-channelTileUpdate : Channel Update
-channelTileUpdate = channel (Tile Nothing)
+channelTileUpdate : Signal.Channel Update
+channelTileUpdate = Signal.channel (Tile Nothing)
 
-channelPlayPause : Channel Update
-channelPlayPause = channel (GameState Paused)
+channelRandomBoard : Signal.Channel Update
+channelRandomBoard = Signal.channel (NewBoard emptyBoard)
 
-channelTickGame : Channel Update
-channelTickGame = channel (Tick SingleStep)
+channelPlayPause : Signal.Channel Update
+channelPlayPause = Signal.channel (GameState Paused)
 
-channelResetGame : Channel Update
-channelResetGame = channel Reset
+channelTickGame : Signal.Channel Update
+channelTickGame = Signal.channel (Tick SingleStep)
+
+channelResetGame : Signal.Channel Update
+channelResetGame = Signal.channel Reset
 
 -- updates of game-state
 updateGame : Update -> Game -> Game
 updateGame action game =
-    let _ = Debug.watch "action" action
-    in  case action of
-            Tile (Just pos)         -> if game.state == Playing then game else updateTile pos game
-            GameState state         -> updateState state game
-            Tick MultiStep          -> if game.state == Playing then updateBoard game else game
-            Tick SingleStep         -> if game.state == Paused  then updateBoard game else game
-            Reset                   -> defaultGame
-            _                       -> game
+    case action of
+        Tile (Just pos)         -> if game.state == Playing then game else updateTile pos game
+        NewBoard newBoard       -> {game | board <- newBoard}
+        GameState state         -> updateState state game
+        Tick MultiStep          -> if game.state == Playing then updateBoard game else game
+        Tick SingleStep         -> if game.state == Paused  then updateBoard game else game
+        Reset                   -> defaultGame
+        _                       -> game
 
 updateState : State -> Game -> Game
 updateState newState game = {game | state <- newState}
@@ -252,19 +274,23 @@ updateBoard game =
 {-----------------------------------
  - Main-function
  -----------------------------------}
-main : Signal GElement.Element
+initialSeed : Signal.Signal Random.Seed
+initialSeed = (\(time, _) -> Random.initialSeed (round time)) <~ Time.timestamp (Time.every Time.second)
+
+main : Signal.Signal GElement.Element
 main = display <~ Window.dimensions
-                ~ foldp updateGame defaultGame (
-                        mergeMany   [ subscribe channelTileUpdate
-                                    , subscribe channelPlayPause
-                                    , subscribe channelTickGame
-                                    , subscribe channelResetGame
-                                    , (\_ -> Tick MultiStep ) <~ (Time.fps 1)
-                                    , dropRepeats (( \(x, y) dim ->
-                                            if x < 0 || y < 0
-                                            then Tile Nothing
-                                            else Tile (Just (getTileFrom (x, y) dim))
-                                      ) <~ keepWhen Mouse.isDown (-1, -1) Mouse.position ~ Window.dimensions)
-                                    ]
+                ~ Signal.foldp updateGame defaultGame (
+                    Signal.mergeMany    [ Signal.subscribe channelTileUpdate
+                                        , Signal.subscribe channelPlayPause
+                                        , Signal.subscribe channelTickGame
+                                        , Signal.subscribe channelResetGame
+                                        , Signal.subscribe channelRandomBoard
+                                        , (\_ -> Tick MultiStep ) <~ (Time.fps 1)
+                                        , Signal.dropRepeats (( \(x, y) dim ->
+                                                if x < 0 || y < 0
+                                                then Tile Nothing
+                                                else Tile (Just (getTileFrom (x, y) dim))
+                                          ) <~ Signal.keepWhen Mouse.isDown (-1, -1) Mouse.position ~ Window.dimensions)
+                                        ]
                   )
-                -- ~ foldp updateTile defaultGame (subscribe channelTileUpdate)
+                ~ initialSeed
