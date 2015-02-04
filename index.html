@@ -2287,7 +2287,7 @@ Elm.GameOfLife.make = function (_elm) {
                                      }();
                                   },
                                   $Time.fps(1))
-                                  ,A2($Signal._op["~"],
+                                  ,$Signal.dropRepeats(A2($Signal._op["~"],
                                   A2($Signal._op["<~"],
                                   F2(function (_v42,dim) {
                                      return function () {
@@ -2308,7 +2308,7 @@ Elm.GameOfLife.make = function (_elm) {
                                   $Mouse.isDown,
                                   {ctor: "_Tuple2",_0: -1,_1: -1},
                                   $Mouse.position)),
-                                  $Window.dimensions)]))));
+                                  $Window.dimensions))]))));
    var Game = F2(function (a,b) {
       return {_: {}
              ,board: a

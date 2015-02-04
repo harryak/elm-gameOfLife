@@ -260,11 +260,11 @@ main = display <~ Window.dimensions
                                     , subscribe channelTickGame
                                     , subscribe channelResetGame
                                     , (\_ -> Tick MultiStep ) <~ (Time.fps 1)
-                                    , ( \(x, y) dim ->
+                                    , dropRepeats (( \(x, y) dim ->
                                             if x < 0 || y < 0
                                             then Tile Nothing
                                             else Tile (Just (getTileFrom (x, y) dim))
-                                      ) <~ keepWhen Mouse.isDown (-1, -1) Mouse.position ~ Window.dimensions
+                                      ) <~ keepWhen Mouse.isDown (-1, -1) Mouse.position ~ Window.dimensions)
                                     ]
                   )
                 -- ~ foldp updateTile defaultGame (subscribe channelTileUpdate)
