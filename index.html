@@ -1781,7 +1781,7 @@ Elm.GameOfLife.make = function (_elm) {
          {case "_Tuple2":
             return $Random.initialSeed($Basics.round(_v0._0));}
          _U.badCase($moduleName,
-         "on line 278, column 30 to 60");
+         "on line 279, column 30 to 60");
       }();
    },
    $Time.timestamp($Time.every($Time.second)));
@@ -1826,10 +1826,10 @@ Elm.GameOfLife.make = function (_elm) {
                                 ,_1: (_v6._1 - tileOffsetY) / ($GameOfLifeConfig.tileSize + $GameOfLifeConfig.tileGap) | 0};
                       }();}
                  _U.badCase($moduleName,
-                 "between lines 152 and 154");
+                 "between lines 153 and 155");
               }();}
          _U.badCase($moduleName,
-         "between lines 152 and 154");
+         "between lines 153 and 155");
       }();
    });
    var tilePosYDir = F2(function (y,
@@ -1858,7 +1858,7 @@ Elm.GameOfLife.make = function (_elm) {
                  return bool ? _v14._0 : _v14._1;
               });}
          _U.badCase($moduleName,
-         "between lines 105 and 106");
+         "between lines 106 and 107");
       }();
    });
    var tileNeighbours = function (_v18) {
@@ -1992,7 +1992,7 @@ Elm.GameOfLife.make = function (_elm) {
                                                                                                                                   ,_1: sy}]);
               }();}
          _U.badCase($moduleName,
-         "between lines 68 and 100");
+         "between lines 69 and 101");
       }();
    };
    var getAliveTilesAround = F2(function (pos,
@@ -2028,7 +2028,7 @@ Elm.GameOfLife.make = function (_elm) {
                  }();
               });}
          _U.badCase($moduleName,
-         "between lines 125 and 133");
+         "between lines 126 and 134");
       }();
    });
    var tileWillLiveConway = tileWillLive({ctor: "_Tuple3"
@@ -2056,16 +2056,21 @@ Elm.GameOfLife.make = function (_elm) {
    };
    var randomBoard = function (seed) {
       return function () {
+         var $ = A2($Random.generate,
+         A2($Random.$int,1,9),
+         seed),
+         propability = $._0,
+         newSeed = $._1;
          var _ = A2($Random.generate,
          A2($Random.list,
          $GameOfLifeConfig.tileNumberXDir * $GameOfLifeConfig.tileNumberYDir,
-         A2($Random.$int,0,1)),
-         seed);
+         A2($Random.$int,0,propability)),
+         newSeed);
          var randomValues = function () {
             switch (_.ctor)
             {case "_Tuple2": return _._0;}
             _U.badCase($moduleName,
-            "on line 58, column 31 to 116");
+            "on line 59, column 31 to 129");
          }();
          var possibleCoordinates = A3($ListExtension.cartesianProduct,
          F2(function (v0,v1) {
@@ -2083,9 +2088,9 @@ Elm.GameOfLife.make = function (_elm) {
                {case "_Tuple2":
                   return {ctor: "_Tuple2"
                          ,_0: _v32._0
-                         ,_1: _U.cmp(_v32._1,0) > 0};}
+                         ,_1: _U.cmp(_v32._1,1) < 0};}
                _U.badCase($moduleName,
-               "on line 60, column 63 to 76");
+               "on line 61, column 63 to 76");
             }();
          })(A2($ListExtension.zip,
          possibleCoordinates,
@@ -2264,13 +2269,13 @@ Elm.GameOfLife.make = function (_elm) {
                                               }();}
                                          break;}
                                     _U.badCase($moduleName,
-                                    "between lines 205 and 220");
+                                    "between lines 206 and 221");
                                  }();
                               },
                               $Dict.toList(game.board))))]));
               }();}
          _U.badCase($moduleName,
-         "between lines 161 and 222");
+         "between lines 162 and 223");
       }();
    });
    var updateGame = F2(function (action,
@@ -2341,7 +2346,7 @@ Elm.GameOfLife.make = function (_elm) {
                                              ,_1: _v54._1},
                                              dim)));}
                                         _U.badCase($moduleName,
-                                        "between lines 290 and 292");
+                                        "between lines 291 and 293");
                                      }();
                                   }),
                                   A3($Signal.keepWhen,

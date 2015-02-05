@@ -55,9 +55,10 @@ defaultGame =   { board = emptyBoard
 randomBoard : Random.Seed -> Board
 randomBoard seed = 
     let possibleCoordinates = LEx.cartesianProduct (,) [0..(tileNumberXDir - 1)] [0..(tileNumberYDir - 1)]
-        (randomValues, _)   = Random.generate (Random.list (tileNumberXDir * tileNumberYDir) (Random.int 0 1)) seed
+        (propability, newSeed) = Random.generate (Random.int 1 9) seed
+        (randomValues, _)   = Random.generate (Random.list (tileNumberXDir * tileNumberYDir) (Random.int 0 propability)) newSeed
         boardList           = LEx.zip possibleCoordinates randomValues
-                                |> List.map (\(pos, flag) -> (pos, flag > 0))
+                                |> List.map (\(pos, flag) -> (pos, flag < 1))
     in  Dict.fromList boardList
 
 {-----------------------------------
